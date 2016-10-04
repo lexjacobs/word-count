@@ -8,11 +8,15 @@ var axios = require('axios');
 
 const App = React.createClass({
   handleSubmit(e) {
+    this.setState({fulltext: 'loading'});
     e.preventDefault();
-    axios.post('http://localhost:3456/count', encodeURIComponent(this.state.fulltext))
+    axios.post('http://localhost:3456/count', this.state)
+      .then((data) => {
+        this.setState({'distribution': data.data.letterDistribution});
+      });
   },
   getInitialState() {
-    return {fileSelected: 'none', fulltext: 'the quick brown fox jumps over the lazy dog'}
+    return {fileSelected: 'none', fulltext: 'the quick brown fox jumps over the lazy dog', distribution: null}
   },
   handleChange(e) {
     var context = this;
@@ -36,7 +40,9 @@ const App = React.createClass({
           <br/>
           file type: {this.state.fileSelected.type}
           <br/>
-          anything?: {JSON.stringify(this.state.fulltext)}
+          distribution: {JSON.stringify(this.state.distribution)}
+          <br/>
+          {this.state.fulltext}
         </div>
       </form>
 
