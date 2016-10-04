@@ -9,7 +9,7 @@ var axios = require('axios');
 const App = React.createClass({
   handleSubmit(e) {
     e.preventDefault();
-    axios.post('http://localhost:3000/count', encodeURIComponent(this.state.fulltext))
+    axios.post('http://localhost:3456/count', encodeURIComponent(this.state.fulltext))
   },
   getInitialState() {
     return {fileSelected: 'none', fulltext: 'the quick brown fox jumps over the lazy dog'}
