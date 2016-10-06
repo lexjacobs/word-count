@@ -10,7 +10,7 @@ const App = React.createClass({
   handleSubmit(e) {
     this.setState({fulltext: 'loading'});
     e.preventDefault();
-    axios.post('http://localhost:3456/count', this.state)
+    axios.post('https://text-counter-server.herokuapp.com/count', this.state)
       .then((data) => {
         this.setState({'distribution': data.data.letterDistribution});
       });
