@@ -1,3 +1,4 @@
+/* global require */
 import React from 'react';
 import './App.css';
 var axios = require('axios');
@@ -5,49 +6,71 @@ var axios = require('axios');
 // import wordCounter from './wordCounter.js';
 // var finnegan = require('./sources/finnegan.txt');
 // const count = wordCounter(finnegan);
+import {Table} from 'reactable';
 
 const App = React.createClass({
   handleSubmit(e) {
-    this.setState({fulltext: 'loading'});
+    this.setState({loading: true, distribution: []});
     e.preventDefault();
-    axios.post('https://text-counter-server.herokuapp.com/count', this.state)
-      .then((data) => {
-        this.setState({'distribution': data.data.letterDistribution});
+    axios.post('https://text-counter-server.herokuapp.com/count', {fulltext: this.state.fulltext}).then((data) => {
+      this.setState({
+        distribution: this.prepareDistribution(data.data.letterDistribution),
+        loading: false
       });
+    }).catch((err) => {
+      console.error(err);
+      this.setState({loading: false});
+    });
   },
   getInitialState() {
-    return {fileSelected: 'none', fulltext: 'the quick brown fox jumps over the lazy dog', distribution: null}
+    return {ditsribution: [], loading: false, fileSelected: '', fulltext: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'};
   },
   handleChange(e) {
     var context = this;
     var file = e.target.files[0];
-    this.setState({'fileSelected': file})
+    this.setState({'fileSelected': file});
     var reader = new FileReader();
-    reader.onload = (function(e) {
+    reader.onload = (function() {
       return function(e) {
-        context.setState({'fulltext': e.target.result})
+        context.setState({'fulltext': e.target.result});
       };
     })(file);
     reader.readAsText(file);
   },
+  prepareDistribution(data) {
+    var result = [];
+    for (var letter in data) {
+      if (data.hasOwnProperty(letter)) {
+        result.push({letter: JSON.stringify(letter), frequency: data[letter]});
+      }
+    }
+    return result;
+  },
   render() {
     return (
-      <form encType={'multipart/form-data'} onSubmit={this.handleSubmit}>
-        <input onChange={(e) => this.handleChange(e)} type="file"></input>
-        <button type="submit">submit</button>
-        <div>
-          file selected: {this.state.fileSelected.name}
-          <br/>
-          file type: {this.state.fileSelected.type}
-          <br/>
-          distribution: {JSON.stringify(this.state.distribution)}
-          <br/>
-          {this.state.fulltext}
-        </div>
-      </form>
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <input onChange={(e) => this.handleChange(e)} type="file"></input>
+          <button type="submit">submit</button>
+          <div>
+            file selected: {this.state.fileSelected.name}
+            <br/>
+            file type: {this.state.fileSelected.type}
+            <br/> {this.state.loading === true
+              ? 'LOADING'
+              : ''}
+          </div>
+        </form>
 
+        <br/>
+        <br/> {this.state.distribution ? 'click column headings to sort' : ''}
+        <br/>
+
+        <Table className="table" data={this.state.distribution} itemsPerPage={140} pageButtonLimit={10} sortable={true}/>
+
+      </div>
     );
   }
-})
+});
 
 export default App;

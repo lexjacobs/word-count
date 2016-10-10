@@ -12,7 +12,8 @@
     "react": "^15.3.2",
     "react-bootstrap": "^0.30.3",
     "react-dom": "^15.3.2",
-    "react-simple-file-input": "^0.1.2"
+    "react-simple-file-input": "^0.1.2",
+    "reactable": "^0.14.0"
   },
   "engines": {
     "node": "6.2.0"
