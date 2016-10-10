@@ -22,6 +22,10 @@ const App = React.createClass({
       this.setState({loading: false});
     });
   },
+  componentDidMount() {
+    // wake up remote server
+    axios.get('https://text-counter-server.herokuapp.com').then(() => console.log('woke up server'));
+  },
   getInitialState() {
     return {ditsribution: [], loading: false, fileSelected: '', fulltext: ''};
   },
